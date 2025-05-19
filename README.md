@@ -14,27 +14,33 @@
   <div id="formulario" class="max-w-5xl mx-auto bg-white p-6 rounded-xl shadow-md">
     <h1 class="text-2xl font-bold mb-4">Informe del Partido</h1>
 
+    <!-- Upload da Logo -->
+    <div class="mb-6">
+      <label class="font-semibold">Logo (será usada na capa do PDF):</label>
+      <input id="logoUpload" type="file" accept="image/*" class="w-full border rounded p-2">
+    </div>
+
     <!-- Informações iniciais -->
     <div class="grid grid-cols-2 gap-4 mb-6">
       <div>
         <label class="font-semibold">Equipo A:</label>
-        <input type="text" class="w-full border rounded p-2" placeholder="Nombre del Equipo A">
+        <input id="equipoA" type="text" class="w-full border rounded p-2" placeholder="Nombre del Equipo A">
       </div>
       <div>
         <label class="font-semibold">Equipo B:</label>
-        <input type="text" class="w-full border rounded p-2" placeholder="Nombre del Equipo B">
+        <input id="equipoB" type="text" class="w-full border rounded p-2" placeholder="Nombre del Equipo B">
       </div>
       <div>
         <label class="font-semibold">Fecha:</label>
-        <input type="date" class="w-full border rounded p-2">
+        <input id="fecha" type="date" class="w-full border rounded p-2">
       </div>
       <div>
         <label class="font-semibold">Hora:</label>
-        <input type="time" class="w-full border rounded p-2">
+        <input id="hora" type="time" class="w-full border rounded p-2">
       </div>
       <div class="col-span-2">
         <label class="font-semibold">Ciudad:</label>
-        <input type="text" class="w-full border rounded p-2" placeholder="Ciudad del Partido">
+        <input id="ciudad" type="text" class="w-full border rounded p-2" placeholder="Ciudad del Partido">
       </div>
     </div>
 
@@ -52,15 +58,37 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('p', 'pt', 'a4');
 
-      const camposImagem = document.querySelectorAll('#foto-uploads input[type="file"]');
-      const labels = document.querySelectorAll('#foto-uploads label');
+      const equipoA = document.getElementById("equipoA").value;
+      const equipoB = document.getElementById("equipoB").value;
+      const fecha = document.getElementById("fecha").value;
+      const hora = document.getElementById("hora").value;
+      const ciudad = document.getElementById("ciudad").value;
+      const logoFile = document.getElementById("logoUpload").files[0];
 
-      let y = 40;
-      doc.setFontSize(16);
-      doc.text("Informe Fotográfico", 40, y);
-      y += 20;
+      const gerarCapa = (logoBase64) => {
+        if (logoBase64) {
+          doc.addImage(logoBase64, 'JPEG', 200, 40, 200, 100);
+        }
+        doc.setFontSize(18);
+        doc.text("Informe del Partido", 220, 160);
+        doc.setFontSize(14);
+        doc.text(`Equipo A: ${equipoA}`, 80, 200);
+        doc.text(`Equipo B: ${equipoB}`, 80, 220);
+        doc.text(`Fecha: ${fecha}`, 80, 240);
+        doc.text(`Hora: ${hora}`, 80, 260);
+        doc.text(`Ciudad: ${ciudad}`, 80, 280);
+      };
 
-      const processarImagens = async () => {
+      const gerarFotos = async () => {
+        doc.addPage();
+        doc.setFontSize(16);
+        doc.text("Informe Fotográfico", 40, 40);
+
+        const camposImagem = document.querySelectorAll('#foto-uploads input[type="file"]');
+        const labels = document.querySelectorAll('#foto-uploads label');
+
+        let y = 60;
+
         for (let i = 0; i < camposImagem.length; i++) {
           const file = camposImagem[i].files[0];
           if (file) {
@@ -91,7 +119,7 @@
         doc.save("informe_partido_fotos.pdf");
       };
 
-      function carregarImagem(file) {
+      const carregarImagem = (file) => {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = e => {
@@ -102,9 +130,22 @@
           reader.onerror = reject;
           reader.readAsDataURL(file);
         });
-      }
+      };
 
-      processarImagens();
+      const carregarLogoBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+          if (!file) return resolve(null);
+          const reader = new FileReader();
+          reader.onload = e => resolve(e.target.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      };
+
+      carregarLogoBase64(logoFile).then(logoBase64 => {
+        gerarCapa(logoBase64);
+        gerarFotos();
+      });
     }
   </script>
 
@@ -151,5 +192,6 @@
 
 </body>
 </html>
+
 
         
