@@ -72,9 +72,9 @@
       "Inspección de seguridad", "Reunión de Seguridad", "Reunión de Coordinación", "Instalación de Objetos de animación",
       "Llegada utilería equipo Visitante", "Utileria equipo local", "Llegada Delegación visitante", "Llegada delegación local",
       "Llegada equipo de arbitraje", "Charla OSC con seguridad privada", "Primera revisión interna y externa",
-      "Instalación de Recursos", "Situación das tribunas protocolo de juego", "Situacion externa a los 70’",
-      "Refuerzo a los 75’", "Evacuación Completa en 45’", "Salida del equipo local", "Salida del arbitraje",
-      "Salida del equipo local por sus medios", "Comer cerrado", "Regreso del equipo visitante"
+      "Instalación de Recursos", "Situación das tribunas protocolo de juego", "Situacion externa",
+      "Refuerzo a los 75’", "Evacuación Completa", "Salida del equipo local", "Salida del arbitraje",
+      "Salida del equipo local por sus medios", "Comet cerrado", "Regreso del equipo visitante"
     ];
 
     window.addEventListener("DOMContentLoaded", () => {
