@@ -44,6 +44,12 @@
       </div>
     </div>
 
+    <!-- Informações do partido -->
+    <div class="mb-6">
+      <label class="font-semibold">Informaciones del Partido:</label>
+      <textarea id="infoPartido" rows="5" class="w-full border rounded p-2" placeholder="Describa aquí los eventos y observaciones del partido..."></textarea>
+    </div>
+
     <!-- Uploads de Fotos -->
     <h2 class="text-xl font-bold mt-8 mb-4">Informe Fotográfico</h2>
     <div id="foto-uploads" class="grid grid-cols-1 gap-4 mb-8"></div>
@@ -63,6 +69,7 @@
       const fecha = document.getElementById("fecha").value;
       const hora = document.getElementById("hora").value;
       const ciudad = document.getElementById("ciudad").value;
+      const infoPartido = document.getElementById("infoPartido").value;
       const logoFile = document.getElementById("logoUpload").files[0];
 
       const gerarCapa = (logoBase64) => {
@@ -77,6 +84,14 @@
         doc.text(`Fecha: ${fecha}`, 80, 240);
         doc.text(`Hora: ${hora}`, 80, 260);
         doc.text(`Ciudad: ${ciudad}`, 80, 280);
+
+        // Página de informações
+        doc.addPage();
+        doc.setFontSize(16);
+        doc.text("Informaciones del Partido", 40, 60);
+        doc.setFontSize(12);
+        const texto = doc.splitTextToSize(infoPartido, 500);
+        doc.text(texto, 40, 80);
       };
 
       const gerarFotos = async () => {
@@ -192,6 +207,3 @@
 
 </body>
 </html>
-
-
-        
