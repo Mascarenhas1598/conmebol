@@ -40,50 +40,7 @@
 
     <!-- Uploads de Fotos -->
     <h2 class="text-xl font-bold mt-8 mb-4">Informe Fotográfico</h2>
-    <div class="grid grid-cols-1 gap-4">
-      <!-- Geração dinâmica dos 23 campos -->
-      <script>
-        const descripciones = [
-          "Arribo delegación visitante",
-          "Llegada del equipo visitante al hotel y seguridad del hotel",
-          "Inspección de seguridad",
-          "Reunión de Seguridad",
-          "Reunión de Coordinación",
-          "Instalación de Objetos de animación",
-          "Llegada utilería equipo Visitante",
-          "Utileria equipo local",
-          "Llegada Delegación visitante",
-          "Llegada delegación local",
-          "Llegada equipo de arbitraje",
-          "Charla OSC con seguridad privada",
-          "Primera revisión interna y externa",
-          "Instalación de Recursos",
-          "Situación das tribunas protocolo de juego",
-          "Situacion externa a los 70’",
-          "Refuerzo a los 75’",
-          "Evacuación Completa en 45’",
-          "Salida del equipo local",
-          "Salida del arbitraje",
-          "Salida del equipo local por sus medios",
-          "Comet cerrado",
-          "Regreso del equipo visitante"
-        ];
-
-        document.addEventListener("DOMContentLoaded", () => {
-          const container = document.querySelector("#foto-uploads");
-          descripciones.forEach((desc, i) => {
-            const campo = document.createElement("div");
-            campo.className = "mb-4";
-            campo.innerHTML = `
-              <label class="block font-semibold mb-1">${i + 1} - ${desc}</label>
-              <input type="file" accept="image/*" class="w-full border p-2 rounded">
-            `;
-            container.appendChild(campo);
-          });
-        });
-      </script>
-      <div id="foto-uploads"></div>
-    </div>
+    <div id="foto-uploads" class="grid grid-cols-1 gap-4 mb-8"></div>
 
     <button onclick="gerarPDF()" class="mt-8 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
       Exportar como PDF
@@ -95,18 +52,104 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('p', 'pt', 'a4');
 
-      html2canvas(document.querySelector("#formulario"), { scale: 2 }).then(canvas => {
-        const imgData = canvas.toDataURL("image/png");
-        const imgProps = doc.getImageProperties(imgData);
-        const pdfWidth = doc.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      const camposImagem = document.querySelectorAll('#foto-uploads input[type="file"]');
+      const labels = document.querySelectorAll('#foto-uploads label');
 
-        doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        doc.save("informe_partido.pdf");
-      });
+      let y = 40;
+      doc.setFontSize(16);
+      doc.text("Informe Fotográfico", 40, y);
+      y += 20;
+
+      const processarImagens = async () => {
+        for (let i = 0; i < camposImagem.length; i++) {
+          const file = camposImagem[i].files[0];
+          if (file) {
+            const img = await carregarImagem(file);
+            doc.setFontSize(12);
+            doc.text(labels[i].innerText, 40, y);
+            y += 10;
+
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            const imgData = canvas.toDataURL("image/jpeg", 0.8);
+
+            const pdfWidth = 500;
+            const ratio = img.height / img.width;
+            const pdfHeight = pdfWidth * ratio;
+
+            if (y + pdfHeight > 800) {
+              doc.addPage();
+              y = 40;
+            }
+            doc.addImage(imgData, 'JPEG', 40, y, pdfWidth, pdfHeight);
+            y += pdfHeight + 20;
+          }
+        }
+        doc.save("informe_partido_fotos.pdf");
+      };
+
+      function carregarImagem(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = e => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.src = e.target.result;
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      processarImagens();
     }
+  </script>
+
+  <script>
+    const descripciones = [
+      "Arribo delegación visitante",
+      "Llegada del equipo visitante al hotel y seguridad del hotel",
+      "Inspección de seguridad",
+      "Reunión de Seguridad",
+      "Reunión de Coordinación",
+      "Instalación de Objetos de animación",
+      "Llegada utilería equipo Visitante",
+      "Utileria equipo local",
+      "Llegada Delegación visitante",
+      "Llegada delegación local",
+      "Llegada equipo de arbitraje",
+      "Charla OSC con seguridad privada",
+      "Primera revisión interna y externa",
+      "Instalación de Recursos",
+      "Situación das tribunas protocolo de juego",
+      "Situacion externa a los 70’",
+      "Refuerzo a los 75’",
+      "Evacuación Completa en 45’",
+      "Salida del equipo local",
+      "Salida del arbitraje",
+      "Salida del equipo local por sus medios",
+      "Comer cerrado",
+      "Regreso del equipo visitante"
+    ];
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const container = document.getElementById("foto-uploads");
+      descripciones.forEach((desc, index) => {
+        const campo = document.createElement("div");
+        campo.className = "mb-4";
+        campo.innerHTML = `
+          <label class="block font-semibold mb-1">${index + 1} - ${desc}</label>
+          <input type="file" accept="image/*" class="w-full border p-2 rounded">
+        `;
+        container.appendChild(campo);
+      });
+    });
   </script>
 
 </body>
 </html>
 
+        
